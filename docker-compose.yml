@@ -1,0 +1,52 @@
+version: "3"
+services:
+  wiki_front:
+    image: nginx:latest
+    #ports:
+    #  - '1234:80'
+    restart: always
+    volumes: 
+      - ./templates:/etc/nginx/templates
+      #- ./nginx.conf:/etc/nginx/nginx.conf
+      - ./auth.txt:/etc/nginx/htpasswd/auth.txt
+    networks:
+      - shared-network
+      - default
+  database:
+    image: postgres:11.6-alpine
+    environment:
+      - POSTGRES_USER=codimd
+      - POSTGRES_PASSWORD=change_password
+      - POSTGRES_DB=codimd
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - default
+  codimd:
+    # you can use image or custom build below,
+    # if you need CJK character with exported PDF files,
+    # please change the image tag with `cjk` postfix version
+    image: nabo.codimd.dev/hackmdio/hackmd:2.1.0
+    # image: nabo.codimd.dev/hackmdio/hackmd:2.1.0-cjk
+    # build:
+    #   context: ..
+    #   dockerfile: ./deployments/Dockerfile
+    environment:
+      - CMD_DB_URL=postgres://codimd:change_password@database/codimd
+      - CMD_USECDN=false
+    depends_on:
+      - database
+    #ports:
+    #  - "3000:3000"
+    volumes:
+      - ./upload:/home/hackmd/app/public/uploads
+    restart: always
+    networks:
+      - default
+#volumes:
+#  database-data: {}
+#  upload-data: {}
+networks:
+  shared-network:
+    external: true
