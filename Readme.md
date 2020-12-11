@@ -1,6 +1,6 @@
 CodiMDをオンプレミス運用する
 
-フロントサーバーの前に https-portalを置き、フロントサーバーでBASIC認証をかける　　
+フロントサーバーの前に https-portalを置き、フロントサーバーでBASIC認証(auth.txt)をかける　　
 
 docker-compose up -d 
 
